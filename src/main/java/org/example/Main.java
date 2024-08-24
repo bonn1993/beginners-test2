@@ -4,6 +4,7 @@ package org.example;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Scanner;
 
@@ -17,7 +18,6 @@ public class Main {
     String addName;
     int addScore;
     int selectMenu;
-    String searchStudentName;
     List<Student> studentList = new ArrayList<>();
 
     // メニュー選択
@@ -75,49 +75,41 @@ public class Main {
         case 2:
           System.out.print("学生の名前を入力してください: ");
           input = scanner.next();
-          searchStudentName = input;
-          Student studentToRemove = null;
-          for (Student student : studentList) {
-            if (student.getName().equals(searchStudentName)) {
-              studentToRemove = student;
-              break;
-            }
-          }
+          String searchStudentName = input;
+          Optional<Student> studentToRemoveOptional = studentList.stream()
+              .filter(student -> student.getName().equals(searchStudentName))
+              .findFirst();
 
-          if (studentToRemove != null) {
+          if (studentToRemoveOptional.isPresent()) {
+            Student studentToRemove = studentToRemoveOptional.get();
             System.out.println(searchStudentName + "のデータを削除します");
             studentList.remove(studentToRemove);
-            continue;
           } else {
             System.out.println("該当する学生データが存在しません");
-            continue;
           }
+          break;
 
           //点数を更新
         case 3:
           System.out.print("点数を更新したい学生の名前を入力してください: ");
           input = scanner.next();
           searchStudentName = input;
-          Student studentToUpdate = null;
-          for (Student student : studentList) {
-            if (student.getName().equals(searchStudentName)) {
-              studentToUpdate = student;
-              break;
-            }
-          }
-          if (studentToUpdate != null) {
+          Optional<Student> studentToUpdateOptional = studentList.stream()
+              .filter(student -> student.getName().equals(searchStudentName))
+              .findFirst();
+
+          if (studentToUpdateOptional.isPresent()) {
+            Student studentToUpdate = studentToUpdateOptional.get();
             System.out.print("新しい点数を入力してください: ");
-            String inputNumber = scanner.next();
+            input = scanner.next();
             try {
-              addScore = Integer.parseInt(inputNumber);
+              addScore = Integer.parseInt(input);
               if (addScore < 0 || addScore > 100) {
                 System.out.println("点数は0～100の範囲で入力してください");
                 continue;
               } else {
                 studentToUpdate.setScore(addScore);
-                System.out.println(studentToUpdate.name + "の点数が[" + studentToUpdate.score
-                    + "]に更新されました");
-                continue;
+                System.out.println(studentToUpdate.getName() + "の点数が[" + studentToUpdate.getScore() + "]に更新されました");
               }
             } catch (NumberFormatException e) {
               System.out.println("無効な文字が入力されています");
@@ -125,21 +117,17 @@ public class Main {
             }
           } else {
             System.out.println("該当する学生データが存在しません");
-            continue;
           }
+          break;
 
           //平均点を計算
         case 4:
-          List<Integer> studentScoreList = new ArrayList<>();
-          for (Student student : studentList) {
-            int score = student.getScore();
-            studentScoreList.add(score);
-          }
-          OptionalDouble averageScore = studentScoreList.stream()
-              .mapToInt(Integer::intValue)
+          OptionalDouble averageScore = studentList.stream()
+              .mapToInt(Student::getScore)
               .average();
+
           averageScore.ifPresent(average -> System.out.println("平均点: " + average + "点"));
-          continue;
+          break;
 
           //全学生の情報を表示
         case 5:
@@ -156,6 +144,6 @@ public class Main {
           return;
       }
     }
-
   }
 }
+
