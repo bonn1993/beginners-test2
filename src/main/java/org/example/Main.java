@@ -2,6 +2,7 @@ package org.example;
 
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.Scanner;
@@ -30,29 +31,29 @@ public class Main {
       System.out.print("選択してください: ");
 
       // 7~9や数字以外を入力した場合のエラー処理
-      input = scanner.next();
       try {
-        selectMenu = Integer.parseInt(input);
+        selectMenu = scanner.nextInt();
         if (selectMenu < 1 || selectMenu > 6) {
           System.out.println("無効な文字が入力されています");
           continue;
         }
-      } catch (NumberFormatException e) {
+      } catch (InputMismatchException e) {
         System.out.println("無効な文字が入力されています");
+        scanner.next();
         continue;
       }
 
       //各メニュー
       switch (selectMenu) {
-          //学生を追加
+        //学生を追加
         case 1:
-                    System.out.print("学生の名前を入力してください: ");
+          System.out.print("学生の名前を入力してください: ");
           addName = scanner.next();
           if (addName.matches("^[0-9]+$")) {
             System.out.println("無効な文字が入力されています");
             continue;
           } else {
-            System.out.print(addName+"の点数を入力してください: ");
+            System.out.print(addName + "の点数を入力してください: ");
             input = scanner.next();
             try {
               addScore = Integer.parseInt(input);
